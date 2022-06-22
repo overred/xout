@@ -91,7 +91,7 @@ func (t Target) Writer(level xlevel.Level, fields xfields.Fields) io.Writer {
 
 	// Decision about colorful output
 	switch t.PosixMode {
-	case xposix.Disabled:
+	case xposix.Clean:
 		// Disable colors at all
 		output = colorable.NewNonColorable(output)
 	case xposix.Auto:
