@@ -11,21 +11,21 @@ import (
 	"gopkg.in/gookit/color.v1"
 )
 
-// LogrusText logrus-text like formatter.
-type LogrusText struct {
+// Default basic formatter with log colorization and fields support.
+type Default struct {
 	startTime time.Time
 }
 
-// NewLogrusText creates new logrus-text like formatter.
-func NewLogrusText() LogrusText {
-	return LogrusText{
+// NewDefault creates new basic formatter.
+func NewDefault() Default {
+	return Default{
 		startTime: time.Now(),
 	}
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f LogrusText) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
-	return LogrusTextWriter{
+func (f Default) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+	return DefaultWriter{
 		output:    output,
 		level:     level,
 		fields:    fields,
@@ -33,8 +33,8 @@ func (f LogrusText) Writer(output io.Writer, level xlevel.Level, fields xfields.
 	}
 }
 
-// LogrusTextWriter io.Writer implementation for this formatter.
-type LogrusTextWriter struct {
+// DefaultWriter io.Writer implementation for this formatter.
+type DefaultWriter struct {
 	output    io.Writer
 	level     xlevel.Level
 	fields    xfields.Fields
@@ -42,13 +42,13 @@ type LogrusTextWriter struct {
 }
 
 // Write writes formatted data into output.
-func (w LogrusTextWriter) Write(input []byte) (int, error) {
+func (w DefaultWriter) Write(input []byte) (int, error) {
 	// Pass text level as is
 	if w.level == xlevel.Text {
 		return w.output.Write(input)
 	}
 
-	levelName := strings.ToUpper(fmt.Sprintf("%.4s", w.level.Higher().String()))
+	levelName := strings.ToUpper(fmt.Sprintf("%-7s", w.level.Higher().String()))
 	colorFormat := map[xlevel.Level]color.Color{
 		xlevel.Trace: color.FgGray,
 		xlevel.Debug: color.FgGray,
@@ -68,9 +68,9 @@ func (w LogrusTextWriter) Write(input []byte) (int, error) {
 	}
 
 	format := fmt.Sprintf(
-		"%-4s[%04d] %-44s %s\n",
+		"%s %s %-44s %s\n",
+		colorFormat.Render(fmt.Sprintf("%04d", int(time.Since(w.startTime).Seconds()))),
 		colorFormat.Render(levelName),
-		int(time.Since(w.startTime).Seconds()),
 		string(strings.ReplaceAll(string(input), "\n", " ")),
 		fields.String(),
 	)

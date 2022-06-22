@@ -1,7 +1,12 @@
 package main
 
 import (
-	"github.com/overred/xout"
+	"os"
+
+	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xformat"
+	"github.com/overred/xout/xlevel"
+	"github.com/overred/xout/xtarget"
 )
 
 func main() {
@@ -29,5 +34,17 @@ func main() {
 	// xout.NewDefault().Write(xlevel.Panic, "hello")
 	// xout.NewDefault().Printf("[%s]\n", "data")
 
-	xout.NewDefault().Fatalf("yaya! <fg=red>PANIC!</>")
+	// xout.NewDefault().Fatalf("yaya! <fg=red>PANIC!</>")
+
+	f := xfields.New().With("key", "val 1").With("data", 5)
+
+	x := xtarget.New(os.Stdout)
+	xa := x.WithFormatter(xformat.NewDefault())
+	xb := x.WithFormatter(xformat.NewLogrusText())
+
+	wa := xa.Writer(xlevel.Info, f)
+	wb := xb.Writer(xlevel.Info, f)
+
+	wa.Write([]byte("test\n"))
+	wb.Write([]byte("test\n"))
 }

@@ -62,7 +62,7 @@ func (mask Level) String() string {
 			case Info:
 				name = "info"
 			case Warn:
-				name = "warn"
+				name = "warning"
 			case Error:
 				name = "error"
 			case Fatal:
