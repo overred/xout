@@ -63,7 +63,7 @@ func (w TextWriter) Write(input []byte) (int, error) {
 
 	fieldsFormat := fields.String()
 	if len(fieldsFormat) > 0 {
-		fieldsFormat = fmt.Sprintf(colorFormat.Render("| %s"), fieldsFormat)
+		fieldsFormat = fmt.Sprintf("%s %s", colorFormat.Render("|"), fieldsFormat)
 	}
 
 	format := fmt.Sprintf(

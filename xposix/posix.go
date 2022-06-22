@@ -14,8 +14,8 @@ const (
 	// Shouldn't be used for files and non-POSIX systems.
 	// Optimized for speed.
 	Raw
-	// Clean force remove POSIX format.
+	// Clear force remove POSIX format.
 	// Safe for all systems and writers.
 	// Optimized for safety.
-	Clean
+	Clear
 )

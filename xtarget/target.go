@@ -34,7 +34,7 @@ type Target struct {
 func New(output io.Writer) Target {
 	return Target{
 		Output:    output,
-		LevelMask: xlevel.Text.Elevate(),
+		LevelMask: xlevel.All,
 		PosixMode: xposix.Auto,
 		Formatter: xformat.NewText(),
 	}
@@ -91,7 +91,7 @@ func (t Target) Writer(level xlevel.Level, fields xfields.Fields) io.Writer {
 
 	// Decision about colorful output
 	switch t.PosixMode {
-	case xposix.Clean:
+	case xposix.Clear:
 		// Disable colors at all
 		output = colorable.NewNonColorable(output)
 	case xposix.Auto:
