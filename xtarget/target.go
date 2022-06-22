@@ -9,6 +9,7 @@ import (
 	"github.com/overred/xout/xformat"
 	"github.com/overred/xout/xlevel"
 	"github.com/overred/xout/xposix"
+	"gopkg.in/gookit/color.v1"
 )
 
 // Target describes target destination with some configurations.
@@ -29,13 +30,13 @@ type Target struct {
 
 // New creates new instance of Target.
 // LevelMask for all levels, automatic PosixMode, and
-// Default formatter.
+// Text formatter.
 func New(output io.Writer) Target {
 	return Target{
 		Output:    output,
 		LevelMask: xlevel.Text.Elevate(),
 		PosixMode: xposix.Auto,
-		Formatter: xformat.NewDefault(),
+		Formatter: xformat.NewText(),
 	}
 }
 
@@ -79,12 +80,13 @@ func (t Target) Writer(level xlevel.Level, fields xfields.Fields) io.Writer {
 		return io.Discard
 	}
 
-	// If output can be cast to *os.File - wrap it by Windows safe output
-	var output io.Writer
-	if f, ok := t.Output.(*os.File); ok {
-		output = colorable.NewColorable(f)
-	} else {
-		output = t.Output
+	// If output can be cast to *os.File
+	// and automatic POSIX mode - wrap it by Windows safe output
+	output := t.Output
+	if t.PosixMode == xposix.Auto {
+		if f, ok := t.Output.(*os.File); ok {
+			output = colorable.NewColorable(f)
+		}
 	}
 
 	// Decision about colorful output
@@ -93,8 +95,8 @@ func (t Target) Writer(level xlevel.Level, fields xfields.Fields) io.Writer {
 		// Disable colors at all
 		output = colorable.NewNonColorable(output)
 	case xposix.Auto:
-		// If destination not a file - disable colors
-		if _, ok := t.Output.(*os.File); !ok {
+		// If destination not a console - disable colors
+		if !color.IsConsole(output) {
 			output = colorable.NewNonColorable(output)
 		} else
 		// If defined special non-color variables - disable colors

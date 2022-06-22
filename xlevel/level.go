@@ -31,6 +31,15 @@ const (
 	Panic
 )
 
+var (
+	// Silent describes zero Level.
+	// If use as a mask Level then no one event will pass.
+	// If use as a log Level then it won't pass.
+	Silent Level = 0
+	// All describes mask for all Level but Silent.
+	All Level = Text.Elevate()
+)
+
 // Has checks that this mask contains specific level.
 func (mask Level) Has(level Level) bool {
 	if mask == 0 || level == 0 {

@@ -8,11 +8,14 @@ const (
 	// This option will remove format if NO_COLOR env var exists
 	// or CLICOLOR=0 or if output target isn't *io.File which
 	// supports POSIX.
+	// Optimized for usability.
 	Auto Mode = iota
-	// Forced pass POSIX as is.
+	// Raw pass POSIX as is.
 	// Shouldn't be used for files and non-POSIX systems.
-	Forced
+	// Optimized for speed.
+	Raw
 	// Disabled force remove POSIX format.
 	// Safe for all systems and writers.
+	// Optimized for safety.
 	Disabled
 )
