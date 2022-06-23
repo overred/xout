@@ -48,12 +48,12 @@ var matrix = []config{
 // bench run matrix tests for given benchmark
 func bench(b *testing.B, formatter Formatter) {
 	for _, conf := range matrix {
+		// Writer cache for hot writing
+		writer := formatter.Writer(io.Discard, conf.Level, conf.Fields)
 		b.Run(fmt.Sprintf("%s[%d]", conf.Level.String(), len(conf.Fields.List())), func(b *testing.B) {
 			b.RunParallel(func(pb *testing.PB) {
 				for pb.Next() {
-					formatter.
-						Writer(io.Discard, conf.Level, conf.Fields).
-						Write([]byte("formatter benchmark text"))
+					writer.Write([]byte("formatter benchmark text"))
 				}
 			})
 		})
@@ -62,6 +62,10 @@ func bench(b *testing.B, formatter Formatter) {
 
 func Benchmark_Format_XoutText(b *testing.B) {
 	bench(b, NewText())
+}
+
+func Benchmark_Format_XoutFastText(b *testing.B) {
+	bench(b, NewFastText())
 }
 
 func Benchmark_Format_LogrusText(b *testing.B) {

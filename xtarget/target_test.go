@@ -24,7 +24,7 @@ var targetPosixRaw = Target{
 var targetPosixClear = Target{
 	Output:    io.Discard,
 	LevelMask: xlevel.All,
-	PosixMode: xposix.Clear,
+	PosixMode: xposix.Clean,
 	Formatter: nil,
 }
 

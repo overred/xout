@@ -21,7 +21,7 @@ var writerPosixRaw = Target{
 var writerPosixClear = Target{
 	Output:    io.Discard,
 	LevelMask: xlevel.All,
-	PosixMode: xposix.Clear,
+	PosixMode: xposix.Clean,
 	Formatter: nil,
 }.Writer(xlevel.Debug, xfields.New())
 

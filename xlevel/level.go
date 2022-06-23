@@ -31,13 +31,19 @@ const (
 	Panic
 )
 
-var (
+const (
 	// Silent describes zero Level.
 	// If use as a mask Level then no one event will pass.
 	// If use as a log Level then it won't pass.
-	Silent Level = 0
+	Silent = Level(0)
+	// AllDebug describes mask for debug messages.
+	AllDebugs = Trace | Debug
+	// AllInfo describes mask for info messages.
+	AllInfos = Info | Warn
+	// AllError describes mask for error messages
+	AllErrors = Error | Fatal | Panic
 	// All describes mask for all Level but Silent.
-	All Level = Text.Elevate()
+	All = Text | AllDebugs | AllInfos | AllErrors
 )
 
 // Has checks that this mask contains specific level.

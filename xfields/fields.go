@@ -41,6 +41,16 @@ func (f Fields) List() []Field {
 	return fields
 }
 
+// Count returns number of Fields.
+func (f Fields) Count() int {
+	return len(f.fields)
+}
+
+// Index returns Field by index.
+func (f Fields) Index(i int) Field {
+	return f.fields[i]
+}
+
 // Find searches for Field with given name.
 // Returns Field's value or nil, and status of existing.
 func (f Fields) Find(name string) (interface{}, bool) {
@@ -87,5 +97,26 @@ func (f Fields) With(name string, value interface{}) Fields {
 	}
 	nf := New()
 	nf.fields = fields
+	return nf
+}
+
+// Merge adds given fields to new instance based on current.
+// It overwrites fields with same names.
+func (f Fields) Merge(fields Fields) Fields {
+	nf := New()
+	nf.fields = make([]Field, len(f.fields), len(f.fields)+len(fields.fields))
+	copy(nf.fields, f.fields)
+
+	for i := range fields.fields {
+		for j := range f.fields {
+			if fields.fields[i].Name == f.fields[j].Name {
+				nf.fields[j] = fields.fields[i]
+				goto skip
+			}
+		}
+		nf.fields = append(nf.fields, fields.fields[i])
+	skip:
+	}
+
 	return nf
 }

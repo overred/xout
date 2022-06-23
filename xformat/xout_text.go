@@ -20,30 +20,18 @@ func NewText() Text {
 	return Text{}
 }
 
-// Writer creates new io.Writer to write into output through this formatter.
-func (f Text) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
-	return TextWriter{
-		output: output,
-		level:  level,
-		fields: fields,
-	}
-}
-
 // TextWriter io.Writer implementation for this formatter.
 type TextWriter struct {
 	output io.Writer
 	level  xlevel.Level
 	fields xfields.Fields
+	color  color.Color
+	format string
 }
 
-// Write writes formatted data into output.
-func (w TextWriter) Write(input []byte) (int, error) {
-	if w.level == xlevel.Text {
-		return w.output.Write(input)
-	}
-
-	levelName := strings.ToUpper(fmt.Sprintf("%-7s", w.level.Higher().String()))
-	colorFormat := map[xlevel.Level]color.Color{
+// Writer creates new io.Writer to write into output through this formatter.
+func (f Text) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+	c := map[xlevel.Level]color.Color{
 		xlevel.Trace: color.FgGray,
 		xlevel.Debug: color.FgGray,
 		xlevel.Info:  color.FgCyan,
@@ -51,26 +39,48 @@ func (w TextWriter) Write(input []byte) (int, error) {
 		xlevel.Error: color.FgRed,
 		xlevel.Fatal: color.FgRed,
 		xlevel.Panic: color.FgRed,
-	}[w.level.Higher()]
-	if colorFormat == 0 {
-		colorFormat = color.FgWhite
+	}[level]
+	if c == 0 {
+		c = color.FgWhite
 	}
 
-	fields := strings.Builder{}
-	for _, field := range w.fields.List() {
-		fields.WriteString(colorFormat.Render(field.Name) + "=" + strconv.Quote(fmt.Sprint(field.Value)) + " ")
+	formatLevel := c.Render(strings.ToUpper(fmt.Sprintf("%-7s", level.Higher().String())))
+
+	formatFields := strings.Builder{}
+	formatFields.Grow(1 << 12)
+	for i := 0; i < fields.Count(); i++ {
+		field := fields.Index(i)
+		formatFields.WriteString(c.Render(field.Name) + "=" + strconv.Quote(fmt.Sprint(field.Value)) + " ")
 	}
 
-	fieldsFormat := fields.String()
-	if len(fieldsFormat) > 0 {
-		fieldsFormat = fmt.Sprintf("%s %s", colorFormat.Render("|"), fieldsFormat)
+	format := fmt.Sprintf("%%s %s %s %%-45s",
+		formatLevel,
+		c.Render("|"),
+	)
+	if formatFields.Len() == 0 {
+		format += "\n"
+	} else {
+		format += c.Render(" | ") + formatFields.String() + "\n"
 	}
 
+	return TextWriter{
+		output: output,
+		level:  level,
+		fields: fields,
+		color:  c,
+		format: format,
+	}
+}
+
+// Write writes formatted data into output.
+func (w TextWriter) Write(input []byte) (int, error) {
+	if w.level == xlevel.Text {
+		return w.output.Write(input)
+	}
 	format := fmt.Sprintf(
-		"%s %-45s %s\n",
-		colorFormat.Render(fmt.Sprintf("%s %s |", time.Now().Format("15:04:05"), levelName)),
-		string(strings.ReplaceAll(string(input), "\n", " ")),
-		fieldsFormat,
+		w.format,
+		w.color.Render(time.Now().Format("15:04:05")),
+		strings.ReplaceAll(string(input), "\n", " "),
 	)
 	return w.output.Write([]byte(format))
 }

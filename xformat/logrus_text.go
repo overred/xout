@@ -3,6 +3,7 @@ package xformat
 import (
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,45 +12,29 @@ import (
 	"gopkg.in/gookit/color.v1"
 )
 
-// LogrusText logrus-text like formatter.
+// LogrusText logrus-like text formatter.
 type LogrusText struct {
-	startTime time.Time
+	Start time.Time
 }
 
-// NewLogrusText creates new logrus-text like formatter.
+// NewLogrusText creates new formatter.
 func NewLogrusText() LogrusText {
 	return LogrusText{
-		startTime: time.Now(),
-	}
-}
-
-// Writer creates new io.Writer to write into output through this formatter.
-func (f LogrusText) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
-	return LogrusTextWriter{
-		output:    output,
-		level:     level,
-		fields:    fields,
-		startTime: f.startTime,
+		Start: time.Now(),
 	}
 }
 
 // LogrusTextWriter io.Writer implementation for this formatter.
 type LogrusTextWriter struct {
-	output    io.Writer
-	level     xlevel.Level
-	fields    xfields.Fields
-	startTime time.Time
+	output io.Writer
+	level  xlevel.Level
+	start  time.Time
+	format string
 }
 
-// Write writes formatted data into output.
-func (w LogrusTextWriter) Write(input []byte) (int, error) {
-	// Pass text level as is
-	if w.level == xlevel.Text {
-		return w.output.Write(input)
-	}
-
-	levelName := strings.ToUpper(fmt.Sprintf("%.4s", w.level.Higher().String()))
-	colorFormat := map[xlevel.Level]color.Color{
+// Writer creates new io.Writer to write into output through this formatter.
+func (f LogrusText) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+	c := map[xlevel.Level]color.Color{
 		xlevel.Trace: color.FgGray,
 		xlevel.Debug: color.FgGray,
 		xlevel.Info:  color.FgCyan,
@@ -57,24 +42,40 @@ func (w LogrusTextWriter) Write(input []byte) (int, error) {
 		xlevel.Error: color.FgRed,
 		xlevel.Fatal: color.FgRed,
 		xlevel.Panic: color.FgRed,
-	}[w.level.Higher()]
-	if colorFormat == 0 {
-		colorFormat = color.FgWhite
+	}[level]
+	if c == 0 {
+		c = color.FgWhite
 	}
 
-	// Original logrus text formatter has reverted values sequence
-	fields := strings.Builder{}
-	list := w.fields.List()
-	for i := len(list) - 1; i >= 0; i-- {
-		fields.WriteString(colorFormat.Render(list[i].Name) + "=" + list[i].String() + " ")
+	formatFields := strings.Builder{}
+	formatFields.Grow(1 << 12)
+	for i := 0; i < fields.Count(); i++ {
+		field := fields.Index(i)
+		formatFields.WriteString(c.Render(field.Name) + "=" + strconv.Quote(field.String()) + " ")
 	}
 
+	format := fmt.Sprintf("%s[%%04d] %%-45s %s\n",
+		c.Render(strings.ToUpper(fmt.Sprintf("%-4s", level.Higher().String()))),
+		formatFields.String(),
+	)
+
+	return LogrusTextWriter{
+		output: output,
+		level:  level,
+		start:  f.Start,
+		format: format,
+	}
+}
+
+// Write writes formatted data into output.
+func (w LogrusTextWriter) Write(input []byte) (int, error) {
+	if w.level == xlevel.Text {
+		return w.output.Write(input)
+	}
 	format := fmt.Sprintf(
-		"%-4s[%04d] %-45s %s\n",
-		colorFormat.Render(levelName),
-		int(time.Since(w.startTime).Seconds()),
-		string(strings.ReplaceAll(string(input), "\n", " ")),
-		fields.String(),
+		w.format,
+		int(time.Since(w.start).Seconds()),
+		strings.ReplaceAll(string(input), "\n", " "),
 	)
 	return w.output.Write([]byte(format))
 }
