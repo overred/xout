@@ -12,16 +12,16 @@ import (
 	"gopkg.in/gookit/color.v1"
 )
 
-// Text basic formatter with log colorization and fields support.
-type Text struct{}
+// textFormatter basic formatter with log colorization and fields support.
+type textFormatter struct{}
 
 // NewText creates new basic formatter.
-func NewText() Text {
-	return Text{}
+func NewText() Formatter {
+	return textFormatter{}
 }
 
-// TextWriter io.Writer implementation for this formatter.
-type TextWriter struct {
+// textWriter io.Writer implementation for this formatter.
+type textWriter struct {
 	output io.Writer
 	level  xlevel.Level
 	fields xfields.Fields
@@ -30,7 +30,7 @@ type TextWriter struct {
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f Text) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+func (f textFormatter) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
 	c := map[xlevel.Level]color.Color{
 		xlevel.Trace: color.FgGray,
 		xlevel.Debug: color.FgGray,
@@ -63,7 +63,7 @@ func (f Text) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields
 		format += c.Render(" | ") + formatFields.String() + "\n"
 	}
 
-	return TextWriter{
+	return textWriter{
 		output: output,
 		level:  level,
 		fields: fields,
@@ -73,7 +73,7 @@ func (f Text) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields
 }
 
 // Write writes formatted data into output.
-func (w TextWriter) Write(input []byte) (int, error) {
+func (w textWriter) Write(input []byte) (int, error) {
 	if w.level == xlevel.Text {
 		return w.output.Write(input)
 	}

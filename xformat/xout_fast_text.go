@@ -7,16 +7,16 @@ import (
 	"github.com/overred/xout/xlevel"
 )
 
-// FastText basic formatter with log colorization and fields support.
-type FastText struct{}
+// fastTextFormatter basic formatter with log colorization and fields support.
+type fastTextFormatter struct{}
 
 // NewFastText creates new basic formatter.
-func NewFastText() FastText {
-	return FastText{}
+func NewFastText() Formatter {
+	return fastTextFormatter{}
 }
 
 // TextWriter io.Writer implementation for this formatter.
-type FastTextWriter struct {
+type fastTextWriter struct {
 	output     io.Writer
 	level      xlevel.Level
 	formatPre  []byte
@@ -24,7 +24,7 @@ type FastTextWriter struct {
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f FastText) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+func (f fastTextFormatter) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
 	formatLevel := []byte(level.Higher().String())
 
 	formatFields := make([]byte, 0, 1<<10)
@@ -45,7 +45,7 @@ func (f FastText) Writer(output io.Writer, level xlevel.Level, fields xfields.Fi
 	formatPost = append(formatPost, formatFields...)
 	formatPost = append(formatPost, '\n')
 
-	return FastTextWriter{
+	return fastTextWriter{
 		output:     output,
 		level:      level,
 		formatPre:  formatPre,
@@ -54,7 +54,7 @@ func (f FastText) Writer(output io.Writer, level xlevel.Level, fields xfields.Fi
 }
 
 // Write writes formatted data into output.
-func (w FastTextWriter) Write(input []byte) (int, error) {
+func (w fastTextWriter) Write(input []byte) (int, error) {
 	if w.level == xlevel.Text {
 		return w.output.Write(input)
 	}

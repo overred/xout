@@ -82,6 +82,13 @@ func (x Logger) WithField(name string, value interface{}) Logger {
 	return x
 }
 
+// WithError returns new instance with new error field added.
+func (x Logger) WithError(err error) Logger {
+	x.fields = x.fields.With("error", err.Error())
+	x.cache = nil
+	return x
+}
+
 // Writer returns writer to write into all targets.
 func (x Logger) Writer(level xlevel.Level) io.Writer {
 	var output io.Writer

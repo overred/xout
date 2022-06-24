@@ -12,20 +12,20 @@ import (
 	"gopkg.in/gookit/color.v1"
 )
 
-// LogrusText logrus-like text formatter.
-type LogrusText struct {
+// logrusTextFormatter logrus-like text formatter.
+type logrusTextFormatter struct {
 	Start time.Time
 }
 
 // NewLogrusText creates new formatter.
-func NewLogrusText() LogrusText {
-	return LogrusText{
+func NewLogrusText() Formatter {
+	return logrusTextFormatter{
 		Start: time.Now(),
 	}
 }
 
-// LogrusTextWriter io.Writer implementation for this formatter.
-type LogrusTextWriter struct {
+// logrusTextWriter io.Writer implementation for this formatter.
+type logrusTextWriter struct {
 	output io.Writer
 	level  xlevel.Level
 	start  time.Time
@@ -33,7 +33,7 @@ type LogrusTextWriter struct {
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f LogrusText) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+func (f logrusTextFormatter) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
 	c := map[xlevel.Level]color.Color{
 		xlevel.Trace: color.FgGray,
 		xlevel.Debug: color.FgGray,
@@ -59,7 +59,7 @@ func (f LogrusText) Writer(output io.Writer, level xlevel.Level, fields xfields.
 		formatFields.String(),
 	)
 
-	return LogrusTextWriter{
+	return logrusTextWriter{
 		output: output,
 		level:  level,
 		start:  f.Start,
@@ -68,7 +68,7 @@ func (f LogrusText) Writer(output io.Writer, level xlevel.Level, fields xfields.
 }
 
 // Write writes formatted data into output.
-func (w LogrusTextWriter) Write(input []byte) (int, error) {
+func (w logrusTextWriter) Write(input []byte) (int, error) {
 	if w.level == xlevel.Text {
 		return w.output.Write(input)
 	}

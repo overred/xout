@@ -10,32 +10,32 @@ import (
 	"github.com/overred/xout/xlevel"
 )
 
-// LogrusJson logrus-json like formatter.
-type LogrusJson struct{}
+// logrusJsonFormatter logrus-json like formatter.
+type logrusJsonFormatter struct{}
 
 // NewLogrusJson creates new logrus-json like formatter.
-func NewLogrusJson() LogrusJson {
-	return LogrusJson{}
+func NewLogrusJson() Formatter {
+	return logrusJsonFormatter{}
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f LogrusJson) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
-	return LogrusJsonWriter{
+func (f logrusJsonFormatter) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+	return logrusJsonWriter{
 		output: output,
 		level:  level,
 		fields: fields,
 	}
 }
 
-// LogrusJsonWriter io.Writer implementation for this formatter.
-type LogrusJsonWriter struct {
+// logrusJsonWriter io.Writer implementation for this formatter.
+type logrusJsonWriter struct {
 	output io.Writer
 	level  xlevel.Level
 	fields xfields.Fields
 }
 
 // Write writes formatted data into output.
-func (w LogrusJsonWriter) Write(input []byte) (int, error) {
+func (w logrusJsonWriter) Write(input []byte) (int, error) {
 	if w.level == xlevel.Text {
 		return w.output.Write(input)
 	}

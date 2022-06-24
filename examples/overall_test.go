@@ -13,7 +13,10 @@ import (
 )
 
 func ExampleOverall() {
+	// Syslog connection
 	slog, _ := syslog.New(syslog.LOG_ERR, "xout")
+
+	// Logger with custom config
 	xlg := xout.New().
 		WithTarget(
 			xtarget.New(os.Stdout).
