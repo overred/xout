@@ -9,14 +9,15 @@ import (
 	"github.com/overred/xout/xtarget"
 )
 
-// NewPresetDefault preset optimized for usability.
+// NewPresetText preset optimized for usability.
 //
 //  - os.Stdin & os.Stdout as the targets
 //  - all non debug levels are allowed
 //  - automatic POSIX mode
 //  - color tags enabled
+//  - caller fields disabled
 //  - default text formatter
-func NewPresetDefault() Logger {
+func NewPresetText() Logger {
 	return New().
 		WithTarget(xtarget.Target{
 			Output:    os.Stderr,
@@ -33,15 +34,16 @@ func NewPresetDefault() Logger {
 		WithTags(true)
 }
 
-// NewPresetDebugDefault preset optimized for usability
+// NewPresetDebugText preset optimized for usability
 // and debugging.
 //
 //  - os.Stdin & os.Stdout as the targets
 //  - all levels are allowed
 //  - automatic POSIX mode
 //  - color tags enabled
+//  - caller fields enabled
 //  - default text formatter
-func NewPresetDebugDefault() Logger {
+func NewPresetDebugText() Logger {
 	return New().
 		WithTarget(xtarget.Target{
 			Output:    os.Stderr,
@@ -55,55 +57,7 @@ func NewPresetDebugDefault() Logger {
 			PosixMode: xposix.Auto,
 			Formatter: xformat.NewText(),
 		}).
-		WithTags(true)
-}
-
-// NewPresetFormat preset optimized for usability with custom formatter.
-//
-//  - os.Stdin & os.Stdout as the targets
-//  - all non debug levels are allowed
-//  - automatic POSIX mode
-//  - color tags enabled
-//  - formatter by Your choice
-func NewPresetFormat(formatter xformat.Formatter) Logger {
-	return New().
-		WithTarget(xtarget.Target{
-			Output:    os.Stderr,
-			LevelMask: xlevel.AllErrors,
-			PosixMode: xposix.Auto,
-			Formatter: formatter,
-		}).
-		WithTarget(xtarget.Target{
-			Output:    os.Stdout,
-			LevelMask: xlevel.AllInfos | xlevel.Text,
-			PosixMode: xposix.Auto,
-			Formatter: formatter,
-		}).
-		WithTags(true)
-}
-
-// NewPresetDebugFormat preset optimized for usability with custom formatter
-// and debugging.
-//
-//  - os.Stdin & os.Stdout as the targets
-//  - all levels are allowed
-//  - automatic POSIX mode
-//  - color tags enabled
-//  - formatter by Your choice
-func NewPresetDebugFormat(formatter xformat.Formatter) Logger {
-	return New().
-		WithTarget(xtarget.Target{
-			Output:    os.Stderr,
-			LevelMask: xlevel.AllErrors,
-			PosixMode: xposix.Auto,
-			Formatter: formatter,
-		}).
-		WithTarget(xtarget.Target{
-			Output:    os.Stdout,
-			LevelMask: xlevel.AllInfos | xlevel.AllDebugs | xlevel.Text,
-			PosixMode: xposix.Auto,
-			Formatter: formatter,
-		}).
+		WithCaller(true).
 		WithTags(true)
 }
 
@@ -113,6 +67,7 @@ func NewPresetDebugFormat(formatter xformat.Formatter) Logger {
 //  - all non debug levels are allowed
 //  - raw POSIX mode
 //  - color tags disabled
+//  - caller fields disabled
 //  - fastest text formatter
 func NewPresetFastText() Logger {
 	return New().
@@ -137,6 +92,7 @@ func NewPresetFastText() Logger {
 //  - all levels are allowed
 //  - raw POSIX mode
 //  - color tags disabled
+//  - caller fields enabled
 //  - fastest text formatter
 func NewPresetDebugFastText() Logger {
 	return New().
@@ -151,5 +107,6 @@ func NewPresetDebugFastText() Logger {
 			LevelMask: xlevel.AllInfos | xlevel.AllDebugs | xlevel.Text,
 			PosixMode: xposix.Raw,
 			Formatter: xformat.NewFastText(),
-		})
+		}).
+		WithCaller(true)
 }

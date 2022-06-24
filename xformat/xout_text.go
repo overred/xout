@@ -80,7 +80,7 @@ func (w TextWriter) Write(input []byte) (int, error) {
 	format := fmt.Sprintf(
 		w.format,
 		w.color.Render(time.Now().Format("15:04:05")),
-		strings.ReplaceAll(string(input), "\n", " "),
+		string(input),
 	)
 	return w.output.Write([]byte(format))
 }

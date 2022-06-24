@@ -33,6 +33,11 @@ func New() Fields {
 	}
 }
 
+// With creates new Fields collection and adds field.
+func With(name string, value interface{}) Fields {
+	return New().With(name, value)
+}
+
 // List returns fields as an array.
 // It'll make a copy of inner fields.
 func (f Fields) List() []Field {

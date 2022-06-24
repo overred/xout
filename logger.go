@@ -3,6 +3,7 @@ package xout
 import (
 	"io"
 
+	"github.com/overred/xout/xcaller"
 	"github.com/overred/xout/xfields"
 	"github.com/overred/xout/xlevel"
 	"github.com/overred/xout/xtarget"
@@ -13,6 +14,8 @@ import (
 type Logger struct {
 	// enable formatting tags support.
 	tags bool
+	// caller add caller information into fields.
+	caller bool
 	// output targets.
 	targets []xtarget.Target
 	// fields contains some special data usually helpful for formatters.
@@ -43,19 +46,31 @@ func (x Logger) WithTags(tags bool) Logger {
 	return x
 }
 
+// WithCaller returns new instance with enabled/disabled formatting tags.
+// BE AWARE: Enabled caller info will flushes cache every time when log calls.
+// So this option has a bad value for logger performance. Use only for debugging.
+func (x Logger) WithCaller(caller bool) Logger {
+	x.caller = caller
+	return x
+}
+
 // WithTarget returns new instance with new target added.
-func (x Logger) WithTarget(target xtarget.Target) Logger {
-	targets := make([]xtarget.Target, len(x.targets)+1)
+func (x Logger) WithTarget(target ...xtarget.Target) Logger {
+	targets := make([]xtarget.Target, len(x.targets)+len(target))
 	copy(targets, x.targets)
-	targets[len(targets)-1] = target
+	for i := 0; i < len(target); i++ {
+		targets[len(targets)-1-i] = target[i]
+	}
 	x.targets = targets
 	x.cache = nil
 	return x
 }
 
-// WithFields returns new instance with added fields.
-func (x Logger) WithFields(fields xfields.Fields) Logger {
-	x.fields = x.fields.Merge(fields)
+// WithFields returns new instance with added fields set or multiple sets.
+func (x Logger) WithFields(fields ...xfields.Fields) Logger {
+	for i := range fields {
+		x.fields = x.fields.Merge(fields[i])
+	}
 	x.cache = nil
 	return x
 }
@@ -71,23 +86,38 @@ func (x Logger) WithField(name string, value interface{}) Logger {
 func (x Logger) Writer(level xlevel.Level) io.Writer {
 	var output io.Writer
 
-	// Trying to find cache
-	if x.cache == nil {
-		x.cache = map[xlevel.Level]io.Writer{}
+	// If caller's info enabled attach additional fields.
+	// It isn't possible to use cache, so fields changes frequently.
+	if x.caller {
+		// frame depth it's number of function calls from any Logger.LogFn() to xcaller.Lookup().
+		// Think about it as a same magic number.
+		const frameDepth = 4
+		x = x.WithFields(xcaller.AsFields(frameDepth))
 	} else {
-		if wr, ok := x.cache[level]; ok {
-			output = wr
+		// Trying to use cache
+		if x.cache == nil {
+			x.cache = map[xlevel.Level]io.Writer{}
+		} else {
+			if wr, ok := x.cache[level]; ok {
+				output = wr
+			}
 		}
 	}
 
-	// Cache generation
+	// Creating multi-writer for targets if didn't find
+	// in cache or caller info enabled.
+	// If caller info enabled it isn't possible to use cache,
+	// so fields changes every time.
 	if output == nil {
 		wrs := make([]io.Writer, 0, len(x.targets))
 		for i := range x.targets {
 			wrs = append(wrs, x.targets[i].Writer(level, x.fields))
 		}
 		output = io.MultiWriter(wrs...)
-		x.cache[level] = output
+		// No reasons for caching.
+		if !x.caller {
+			x.cache[level] = output
+		}
 	}
 
 	return writer{

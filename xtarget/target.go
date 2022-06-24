@@ -29,14 +29,13 @@ type Target struct {
 }
 
 // New creates new instance of Target.
-// LevelMask for all levels, automatic PosixMode, and
-// Text formatter.
+// LevelMask for all levels, automatic PosixMode,
+// and without Formatter.
 func New(output io.Writer) Target {
 	return Target{
 		Output:    output,
 		LevelMask: xlevel.All,
 		PosixMode: xposix.Auto,
-		Formatter: xformat.NewText(),
 	}
 }
 

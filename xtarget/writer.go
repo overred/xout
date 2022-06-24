@@ -37,7 +37,13 @@ func (w Writer) Write(p []byte) (int, error) {
 	}
 	// Use Formatter if defined
 	if w.formatter != nil {
-		return w.formatter.Writer(w.output, w.level, w.fields).Write(p)
+		// So io.MultiWriter has an implementation which returns an error
+		// when length of given bytes not equal length bytes which were wrote
+		// we use this hack.
+		if n, err := w.formatter.Writer(w.output, w.level, w.fields).Write(p); err != nil {
+			return n, err
+		}
+		return len(p), nil
 	}
 	return w.output.Write(p)
 }

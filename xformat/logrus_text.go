@@ -75,7 +75,7 @@ func (w LogrusTextWriter) Write(input []byte) (int, error) {
 	format := fmt.Sprintf(
 		w.format,
 		int(time.Since(w.start).Seconds()),
-		strings.ReplaceAll(string(input), "\n", " "),
+		string(input),
 	)
 	return w.output.Write([]byte(format))
 }
