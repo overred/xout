@@ -1,12 +1,36 @@
 # :pencil: XOut Logger
-> XOut /ksaut/ - Fast, Flexible, and made for Usability Logger. 
+> XOut - Simple Logger Made for Usability.
 
 ## :star: Features
-- Color output with formatting tags
+- :rainbow: Color output with formatting tags
   (thanks to [@inhere] with [gookit/color]).
-- Color output for Windows (thanks to [@mattn] with [go-colorable]).
-- Multiple output targets with customization for each.
-- Built-in output formatters inspired by [logrus] and [zerolog].
+- :window: Color output for Windows (thanks to [@mattn] with [go-colorable]).
+- :twisted_rightwards_arrows: Multiple output targets with customization for each.
+- :gear: Built-in output formatters inspired by [logrus] and [zerolog].
+- :books: Built-in loggers presets for different scenarios.
+
+## :package: <span id="installation">Installation</span>
+`go get -u github.com/overred/xout`
+
+## :rocket: <span id="usage">Usage</span>
+
+### :checkered_flag: <span id="fast-tour">Fast Tour</span>
+
+#### Default Built-In Logger
+The simples way to start with Default logger.
+It's as simple as:
+```go
+xout.Info("Info log level!")
+xout.Infof("Formatting Like %s", "fmt.Printf")
+xout.Infof("And <fg=cyan>formatting tags</> support!")
+```
+// TODO:
+
+### :diving_mask: <span id="deep-dive">Deep Dive</span>
+// TODO:
+
+## :abacus: <span id="reasons">Yet Another Logger?</span>
+// TODO:
 
 # :link: <span id="links">Links</span>
 

@@ -9,49 +9,48 @@ import (
 	"github.com/overred/xout/xtarget"
 )
 
-// NewPresetText preset optimized for usability.
+// NewPresetDefault preset optimized for usability with targets to terminal.
 //
-//  - os.Stdin & os.Stdout as the targets
-//  - all non debug levels are allowed
-//  - automatic POSIX mode
-//  - color tags enabled
-//  - caller fields disabled
-//  - default text formatter
-func NewPresetText() Logger {
+// Production:
+//  - Targets  : os.Stderr (Error, Fatal, & Panic), & os.Stdout (other).
+//  - Levels   : all non-debugging (not Trace, not Debug).
+//  - POSIX    : automatic (colored if terminal only).
+//  - Tags     : enabled (gookit/color tags).
+//  - Caller   : disabled (no info about caller function).
+//  - Formatter: XOut Text.
+//
+// Debug:
+//  - Targets  : os.Stderr (Error, Fatal, & Panic), & os.Stdout (other).
+//  - Levels   : all (even Trace, & Debug).
+//  - POSIX    : automatic (colored if terminal only).
+//  - Tags     : enabled (gookit/color tags).
+//  - Caller   : enabled (info about caller function).
+//  - Formatter: XOut Text.
+func NewPresetDefault(debug ...bool) Logger {
+	if len(debug) == 0 || !debug[0] {
+		return New().
+			WithTargets(xtarget.Target{
+				Output:    os.Stderr,
+				LevelMask: xlevel.AllErrors,
+				PosixMode: xposix.Auto,
+				Formatter: xformat.NewText(),
+			}).
+			WithTargets(xtarget.Target{
+				Output:    os.Stdout,
+				LevelMask: xlevel.AllInfos | xlevel.Text,
+				PosixMode: xposix.Auto,
+				Formatter: xformat.NewText(),
+			}).
+			WithTags(true)
+	}
 	return New().
-		WithTarget(xtarget.Target{
+		WithTargets(xtarget.Target{
 			Output:    os.Stderr,
 			LevelMask: xlevel.AllErrors,
 			PosixMode: xposix.Auto,
 			Formatter: xformat.NewText(),
 		}).
-		WithTarget(xtarget.Target{
-			Output:    os.Stdout,
-			LevelMask: xlevel.AllInfos | xlevel.Text,
-			PosixMode: xposix.Auto,
-			Formatter: xformat.NewText(),
-		}).
-		WithTags(true)
-}
-
-// NewPresetDebugText preset optimized for usability
-// and debugging.
-//
-//  - os.Stdin & os.Stdout as the targets
-//  - all levels are allowed
-//  - automatic POSIX mode
-//  - color tags enabled
-//  - caller fields enabled
-//  - default text formatter
-func NewPresetDebugText() Logger {
-	return New().
-		WithTarget(xtarget.Target{
-			Output:    os.Stderr,
-			LevelMask: xlevel.AllErrors,
-			PosixMode: xposix.Auto,
-			Formatter: xformat.NewText(),
-		}).
-		WithTarget(xtarget.Target{
+		WithTargets(xtarget.Target{
 			Output:    os.Stdout,
 			LevelMask: xlevel.AllInfos | xlevel.AllDebugs | xlevel.Text,
 			PosixMode: xposix.Auto,
@@ -61,48 +60,47 @@ func NewPresetDebugText() Logger {
 		WithTags(true)
 }
 
-// NewPresetFastText preset optimized for performance.
+// NewPresetPerformance preset optimized for performance with targets to terminal.
 //
-//  - os.Stdin & os.Stdout as the targets
-//  - all non debug levels are allowed
-//  - raw POSIX mode
-//  - color tags disabled
-//  - caller fields disabled
-//  - fastest text formatter
-func NewPresetFastText() Logger {
+// Production:
+//  - Targets  : os.Stderr (Error, Fatal, & Panic), & os.Stdout (other).
+//  - Levels   : all non-debugging (not Trace, not Debug).
+//  - POSIX    : raw (colors pass as is).
+//  - Tags     : disabled (gookit/color tags passed as is).
+//  - Caller   : disabled (no info about caller function).
+//  - Formatter: XOut Fast Text.
+//
+// Debug:
+//  - Targets  : os.Stderr (Error, Fatal, & Panic), & os.Stdout (other).
+//  - Levels   : all (even Trace, & Debug).
+//  - POSIX    : raw (colors pass as is).
+//  - Tags     : disabled (gookit/color tags passed as is).
+//  - Caller   : enabled (info about caller function).
+//  - Formatter: XOut Fast Text.
+func NewPresetPerformance(debug ...bool) Logger {
+	if len(debug) == 0 || !debug[0] {
+		return New().
+			WithTargets(xtarget.Target{
+				Output:    os.Stderr,
+				LevelMask: xlevel.AllErrors,
+				PosixMode: xposix.Raw,
+				Formatter: xformat.NewFastText(),
+			}).
+			WithTargets(xtarget.Target{
+				Output:    os.Stdout,
+				LevelMask: xlevel.AllInfos | xlevel.Text,
+				PosixMode: xposix.Raw,
+				Formatter: xformat.NewFastText(),
+			})
+	}
 	return New().
-		WithTarget(xtarget.Target{
+		WithTargets(xtarget.Target{
 			Output:    os.Stderr,
 			LevelMask: xlevel.AllErrors,
 			PosixMode: xposix.Raw,
 			Formatter: xformat.NewFastText(),
 		}).
-		WithTarget(xtarget.Target{
-			Output:    os.Stdout,
-			LevelMask: xlevel.AllInfos | xlevel.Text,
-			PosixMode: xposix.Raw,
-			Formatter: xformat.NewFastText(),
-		})
-}
-
-// NewPresetDebugFastText preset optimized for performance
-// and debugging.
-//
-//  - os.Stdin & os.Stdout as the targets
-//  - all levels are allowed
-//  - raw POSIX mode
-//  - color tags disabled
-//  - caller fields enabled
-//  - fastest text formatter
-func NewPresetDebugFastText() Logger {
-	return New().
-		WithTarget(xtarget.Target{
-			Output:    os.Stderr,
-			LevelMask: xlevel.AllErrors,
-			PosixMode: xposix.Raw,
-			Formatter: xformat.NewFastText(),
-		}).
-		WithTarget(xtarget.Target{
+		WithTargets(xtarget.Target{
 			Output:    os.Stdout,
 			LevelMask: xlevel.AllInfos | xlevel.AllDebugs | xlevel.Text,
 			PosixMode: xposix.Raw,

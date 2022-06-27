@@ -4,13 +4,13 @@ import (
 	"io"
 	"testing"
 
-	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xfield"
 	"github.com/overred/xout/xlevel"
 	"github.com/overred/xout/xposix"
 )
 
 // Prepared fields set.
-var fields = xfields.New()
+var fields = xfield.New()
 
 // The minimal and lightweight target.
 var targetPosixRaw = Target{

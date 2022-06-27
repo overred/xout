@@ -1,11 +1,12 @@
 package xtarget
 
 import (
+	"flag"
 	"io"
 	"os"
 
 	"github.com/mattn/go-colorable"
-	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xfield"
 	"github.com/overred/xout/xformat"
 	"github.com/overred/xout/xlevel"
 	"github.com/overred/xout/xposix"
@@ -15,7 +16,7 @@ import (
 // Target describes target destination with some configurations.
 type Target struct {
 	// Output is an output destination. It may be console, file or any other stream.
-	// If nil - output won't produced.
+	// If nil - output won't produced but Formatter will use anyway.
 	Output io.Writer
 	// LevelMask describes levels mask and acts like filter.
 	// If zero - no one event will send to writer (silent mode).
@@ -65,18 +66,23 @@ func (t Target) WithFormatter(formatter xformat.Formatter) Target {
 
 // Writer produces new io.Writer compatible object according Target's configuration.
 // Fields are optional and usually helpful for formatters.
-func (t Target) Writer(level xlevel.Level, fields xfields.Fields) io.Writer {
-	// Skip if no destination
-	if t.Output == nil {
-		return io.Discard
-	}
+func (t Target) Writer(level xlevel.Level, fields xfield.Fields) io.Writer {
 	// Skip if zero level (silent mode)
-	if t.LevelMask.Has(0) {
+	if t.LevelMask.Has(xlevel.Silent) {
 		return io.Discard
 	}
 	// Skip if configured level mask not contain given level
 	if !t.LevelMask.Has(level) {
 		return io.Discard
+	}
+	// If no Output then io.Discard will use and Formatter will execute anyway
+	if t.Output == nil {
+		t.Output = io.Discard
+	}
+	// If Logger runs in test mode (via go test) - hide any output.
+	// ! A bit performance cost. It's ok if cache enabled.
+	if flag.Lookup("test.v") != nil {
+		t.Output = io.Discard
 	}
 
 	// If output can be cast to *os.File

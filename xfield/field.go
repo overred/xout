@@ -1,9 +1,16 @@
-package xfields
+package xfield
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
+)
+
+const (
+	// NameCaller contains name to describe caller's file name, line number, and func.
+	NameCaller = "caller"
+	// NameError contains name to describe errors.
+	NameError = "error"
 )
 
 // Field single field with some information for formatters.
@@ -103,6 +110,25 @@ func (f Fields) With(name string, value interface{}) Fields {
 	nf := New()
 	nf.fields = fields
 	return nf
+}
+
+// Remove returns new fields with removed field if exists.
+func (f Fields) Remove(name string) Fields {
+	index := -1
+	for i := range f.fields {
+		if f.fields[i].Name == name {
+			index = i
+			break
+		}
+	}
+	if index > -1 {
+		nf := New()
+		nf.fields = make([]Field, 0, len(f.fields)-1)
+		nf.fields = append(nf.fields, f.fields[0:index]...)
+		nf.fields = append(nf.fields, f.fields[index+1:]...)
+		return nf
+	}
+	return f
 }
 
 // Merge adds given fields to new instance based on current.

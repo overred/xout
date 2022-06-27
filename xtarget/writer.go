@@ -3,7 +3,7 @@ package xtarget
 import (
 	"io"
 
-	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xfield"
 	"github.com/overred/xout/xformat"
 	"github.com/overred/xout/xlevel"
 )
@@ -18,7 +18,7 @@ type Writer struct {
 	level xlevel.Level
 	// fields contains some useful information.
 	// It's helpful for Formatters.
-	fields xfields.Fields
+	fields xfield.Fields
 	// formatter is a preprocessor for data before it will
 	// write to Output.
 	// Data will write directly to Output if formatter not defined.
@@ -35,6 +35,7 @@ func (w Writer) Write(p []byte) (int, error) {
 	if w.level == 0 {
 		return 0, nil
 	}
+
 	// Use Formatter if defined
 	if w.formatter != nil {
 		// So io.MultiWriter has an implementation which returns an error

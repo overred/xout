@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xfield"
 	"github.com/overred/xout/xlevel"
 	"gopkg.in/gookit/color.v1"
 )
@@ -33,7 +33,7 @@ type logrusTextWriter struct {
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f logrusTextFormatter) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+func (f logrusTextFormatter) Writer(output io.Writer, level xlevel.Level, fields xfield.Fields) io.Writer {
 	c := map[xlevel.Level]color.Color{
 		xlevel.Trace: color.FgGray,
 		xlevel.Debug: color.FgGray,

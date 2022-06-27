@@ -3,7 +3,7 @@ package xformat
 import (
 	"io"
 
-	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xfield"
 	"github.com/overred/xout/xlevel"
 )
 
@@ -24,10 +24,14 @@ type fastTextWriter struct {
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f fastTextFormatter) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+func (f fastTextFormatter) Writer(output io.Writer, level xlevel.Level, fields xfield.Fields) io.Writer {
+	if level == xlevel.Text {
+		return output
+	}
+
 	formatLevel := []byte(level.Higher().String())
 
-	formatFields := make([]byte, 0, 1<<10)
+	formatFields := make([]byte, 0, 1<<8)
 	for i := 0; i < fields.Count(); i++ {
 		field := fields.Index(i)
 		formatFields = append(formatFields, []byte(field.Name)...)
@@ -36,11 +40,11 @@ func (f fastTextFormatter) Writer(output io.Writer, level xlevel.Level, fields x
 		formatFields = append(formatFields, ' ')
 	}
 
-	formatPre := make([]byte, 0, 1<<10)
+	formatPre := make([]byte, 0, 1<<8)
 	formatPre = append(formatPre, formatLevel...)
 	formatPre = append(formatPre, ':', ' ')
 
-	formatPost := make([]byte, 0, 1<<10)
+	formatPost := make([]byte, 0, 1<<8)
 	formatPost = append(formatPost, ' ')
 	formatPost = append(formatPost, formatFields...)
 	formatPost = append(formatPost, '\n')
@@ -55,9 +59,6 @@ func (f fastTextFormatter) Writer(output io.Writer, level xlevel.Level, fields x
 
 // Write writes formatted data into output.
 func (w fastTextWriter) Write(input []byte) (int, error) {
-	if w.level == xlevel.Text {
-		return w.output.Write(input)
-	}
 	format := make([]byte, 0, len(w.formatPre)+len(input)+len(w.formatPost))
 	format = append(format, w.formatPre...)
 	format = append(format, input...)

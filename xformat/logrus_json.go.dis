@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xfield"
 	"github.com/overred/xout/xlevel"
 )
 
@@ -19,7 +19,7 @@ func NewLogrusJson() Formatter {
 }
 
 // Writer creates new io.Writer to write into output through this formatter.
-func (f logrusJsonFormatter) Writer(output io.Writer, level xlevel.Level, fields xfields.Fields) io.Writer {
+func (f logrusJsonFormatter) Writer(output io.Writer, level xlevel.Level, fields xfield.Fields) io.Writer {
 	return logrusJsonWriter{
 		output: output,
 		level:  level,
@@ -31,7 +31,7 @@ func (f logrusJsonFormatter) Writer(output io.Writer, level xlevel.Level, fields
 type logrusJsonWriter struct {
 	output io.Writer
 	level  xlevel.Level
-	fields xfields.Fields
+	fields xfield.Fields
 }
 
 // Write writes formatted data into output.

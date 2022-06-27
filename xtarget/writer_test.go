@@ -4,7 +4,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/overred/xout/xfields"
+	"github.com/overred/xout/xfield"
 	"github.com/overred/xout/xlevel"
 	"github.com/overred/xout/xposix"
 )
@@ -15,7 +15,7 @@ var writerPosixRaw = Target{
 	LevelMask: xlevel.All,
 	PosixMode: xposix.Raw,
 	Formatter: nil,
-}.Writer(xlevel.Debug, xfields.New())
+}.Writer(xlevel.Debug, xfield.New())
 
 // The writer with force POSIX clean mode.
 var writerPosixClear = Target{
@@ -23,7 +23,7 @@ var writerPosixClear = Target{
 	LevelMask: xlevel.All,
 	PosixMode: xposix.Clean,
 	Formatter: nil,
-}.Writer(xlevel.Debug, xfields.New())
+}.Writer(xlevel.Debug, xfield.New())
 
 // The writer with automatic POSIX.
 var writerPosixAuto = Target{
@@ -31,7 +31,7 @@ var writerPosixAuto = Target{
 	LevelMask: xlevel.All,
 	PosixMode: xposix.Auto,
 	Formatter: nil,
-}.Writer(xlevel.Debug, xfields.New())
+}.Writer(xlevel.Debug, xfield.New())
 
 func Benchmark_Writer_PosixRaw(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
