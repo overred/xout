@@ -3,7 +3,9 @@
 [![Go Report][report-img]][report]
 
 # :pencil: XOut Logger
-> XOut - Simple Logger Made for Usability.
+> XOut - Multi-Target Logger with Individual Customization for Each Target.
+
+Use colored terminal to log All events. Use syslog to log Error events. Use database to log Trace&Debug events. Use file to log Info events. Use **All of It simultaneously** with different formatters and log levels for each!
 
 ## :star: Features
 - :rainbow: Color output with formatting tags
