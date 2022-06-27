@@ -1,3 +1,7 @@
+[![GoDoc][doc-img]][doc]
+[![LICENSE][license-img]][license]
+[![Go Report][report-img]][report]
+
 # :pencil: XOut Logger
 > XOut - Simple Logger Made for Usability.
 
@@ -30,6 +34,14 @@ xout.Infof("And <fg=cyan>formatting tags</> support!")
 // TODO:
 
 ## :abacus: <span id="reasons">Yet Another Logger?</span>
+In general, I needed a tool as simple as standard fmt, as functional as [logrus] and as fast as [zap].
+
+Hence there are several requirements. The logger should work out of the box for rapid prototyping and at the same time be flexible for more detailed configuration.
+
+It is important for me that the logger is able to display colored text in the Windows console and be able to output the log in parallel to several targets with flexible settings for each.
+
+For example, I would like to output a log to the terminal, errors to syslog and simultaneously write a log to the database and a file in a specific format.
+
 // TODO:
 
 # :link: <span id="links">Links</span>
@@ -69,3 +81,11 @@ xout.Infof("And <fg=cyan>formatting tags</> support!")
 
 [@rs]: https://github.com/rs
 > [@rs]: Director of Engineering at Netflix Co-Founder & ex-CTO of Dailymotion Co-Founder of NextDNS
+
+[doc-img]: https://pkg.go.dev/badge/overred/xout
+[doc]: https://pkg.go.dev/overred/xout
+[go-ver-img]: https://img.shields.io/github/go-mod/go-version/overred/xout
+[license-img]: https://img.shields.io/github/license/overred/xout
+[license]: https://raw.githubusercontent.com/overred/xout/master/LICENSE
+[report-img]: https://goreportcard.com/badge/github.com/overred/xout
+[report]: https://goreportcard.com/report/github.com/overred/xout
