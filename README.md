@@ -12,6 +12,14 @@
 - :twisted_rightwards_arrows: Multiple output targets with customization for each.
 - :gear: Built-in output formatters inspired by [logrus] and [zerolog].
 - :books: Built-in loggers presets for different scenarios.
+- :construction: ~~Fast configuration from config file.~~
+
+## :abacus: <span id="reasons">Yet Another Logger?</span>
+Yes. But, I would like a very simple like [logrus], pretty fast like [zap] and [zerolog], and flexible and convenient logger.
+
+With a simple setup for rapid prototyping. With the ability to output the log to several places at once (DB, file, syslog and terminal) with a specific level of logging and format for each. In addition, I would like cross-platform with color text support for the Windows console and convenient tag-based text formatting.
+
+That's it.
 
 ## :package: <span id="installation">Installation</span>
 `go get -u github.com/overred/xout`
@@ -33,15 +41,10 @@ xout.Infof("And <fg=cyan>formatting tags</> support!")
 ### :diving_mask: <span id="deep-dive">Deep Dive</span>
 // TODO:
 
-## :abacus: <span id="reasons">Yet Another Logger?</span>
-In general, I needed a tool as simple as standard fmt, as functional as [logrus] and as fast as [zap].
+## :racing_car: <span id="performance">Performance</span>
+// TODO:
 
-Hence there are several requirements. The logger should work out of the box for rapid prototyping and at the same time be flexible for more detailed configuration.
-
-It is important for me that the logger is able to display colored text in the Windows console and be able to output the log in parallel to several targets with flexible settings for each.
-
-For example, I would like to output a log to the terminal, errors to syslog and simultaneously write a log to the database and a file in a specific format.
-
+## :speech_balloon: <span id="faq">FAQ</span>
 // TODO:
 
 # :link: <span id="links">Links</span>
